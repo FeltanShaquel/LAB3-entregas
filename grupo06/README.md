@@ -4,8 +4,9 @@
 
 ## Integrantes
 <!-- Completar en el primer Pull Request -->
-- Apellido, Nombre (@usuario-github)
-- Apellido, Nombre (@usuario-github)
+- Diaz, Agustina (@agustinadiiiaz)
+- Feltan, Shaquel (@FeltanShaquel)
+- Pires, Facundo (@facundopires23)
 
 ## Archivos
 <!-- Qué archivo hace qué -->
