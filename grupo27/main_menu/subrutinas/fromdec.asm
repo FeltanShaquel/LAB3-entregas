@@ -1,6 +1,7 @@
 
 
 .EXTERNAL SUMOVER-SUMOVER
+sub_sumover     .FILL SUMOVER-SUMOVER
 
 
 ;   ============================================================================
@@ -118,11 +119,12 @@ fromdec_dec                             ;
     AND R0 R0 #0                        ;
     ST R0 fromdec_fraccion_l            ;   [fraccion_l] = 0
     ST R0 fromdec_fraccion_h            ;   [fraccion_h] = 0
-    AND R3 R3 #0                        ;
-    ADD R3 R3 #9                        ;   [R3] contador = 9
+    AND R0 R0 #0                        ;
+    ADD R0 R0 #9                        ;   
+    ST R0 fromdec_contador              ;   [contador] = 9
 
 fromdec_dec_loop                        ;   
-    ADD R3 R3 #0                        ;   
+    LD R0 fromdec_contador              ;   
     BRnz fromdec_dec_break              ;   while contador > 0:
     AND R0 R0 #0                        ;
     ST R0 fromdec_current               ;       [current] = 0
@@ -169,7 +171,8 @@ fromdec_dec_incr_sk2                    ;
     LD R0 fromdec_aux_l                 ;
     LD R1 fromdec_fraccion_l            ;
     AND R2 R2 #0                        ;
-    JSR SUMOVER-SUMOVER                 ;
+    LD R3 sub_sumover                   ;
+    JSRR R3                             ;
     ST R0 fromdec_aux_l                 ;
     LD R0 fromdec_aux_h                 ;
     LD R1 fromdec_fraccion_h            ;
@@ -193,11 +196,14 @@ fromdec_dec_incr_sk3                    ;
     ADD R0 R0 R1                        ;
     ST R0 fromdec_fraccion_l            ;       [fraccion_l] = [fraccion_l] + [current]
 
-    ADD R3 R3 #-1                       ;       contador -= 1
+    LD R0 fromdec_contador              ;
+    ADD R0 R0 #-1                       ;       
+    ST R0 fromdec_contador              ;       [contador] -= 1
     BRnzp fromdec_dec_loop              ;
 
 fromdec_dec_break                       ;
-    AND R3 R3 #0                        ;   [R3] contador = 0
+    AND R0 R0 #0                        ;   
+    ST R0 fromdec_contador              ;   [contador] = 0
 
 fromdec_dec_loop2                       ;   while True:
     LD R0 fromdec_fraccion_h            ;
@@ -214,7 +220,8 @@ fromdec_dec_loop2_sk1                   ;
     LD R0 fromdec_fraccion_l            ;
     LD R1 fromdec_neg_frac_l            ;
     AND R2 R2 #0                        ;
-    JSR SUMOVER-SUMOVER                 ;
+    LD R3 sub_sumover                   ;
+    JSRR R3                             ;
     ST R0 fromdec_aux_l                 ;
     LD R0 fromdec_fraccion_h            ;
     LD R1 fromdec_neg_frac_h            ;
@@ -222,8 +229,9 @@ fromdec_dec_loop2_sk1                   ;
     ADD R0 R0 R2                        ;
     ST R0 fromdec_aux_h                 ;       [aux_h, aux_l] = [fraccion_h, fraccion_l] - 1_000_000_000
     
-    ADD R0 R3 #-16                      ;
-    BRn fromdec_dec_increment2          ;       if contador >= 16:
+    LD R0 fromdec_contador              ;
+    ADD R0 R0 #-16                      ;
+    BRn fromdec_dec_increment2          ;       if [contador] >= 16:
 
     LD R0 fromdec_aux_h                 ;
     BRn fromdec_ret                     ;           if [aux_h, aux_l] >= 0:
@@ -255,7 +263,9 @@ fromdec_dec_increment2                  ;
     ST R0 fromdec_fraccion_h            ;           [fraccion_h, fraccion_l] = [aux_h, aux_l]
     
 fromdec_dec_continue2                   ;
-    ADD R3 R3 #1                        ;       contador += 1
+    LD R0 fromdec_contador              ;
+    ADD R0 R0 #1                        ;
+    ST R0 fromdec_contador              ;       [contador] += 1
     BRnzp fromdec_dec_loop2             ;
 
 ;   ==- Return -================================================================
@@ -299,6 +309,7 @@ fromdec_fraccion_l      .FILL #0
 fromdec_aux_h           .FILL #0
 fromdec_aux_l           .FILL #0
 fromdec_current         .FILL #0
+fromdec_contador        .FILL #0
 fromdec_r2              .FILL #0
 fromdec_r3              .FILL #0
 fromdec_r4              .FILL #0

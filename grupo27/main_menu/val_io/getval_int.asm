@@ -2,11 +2,15 @@
 
 .EXTERNAL GETVAL_BUFFER-BUFFER
 .EXTERNAL GETVAL_BUFFER-BUFFER_END
+ext_buffer      .FILL GETVAL_BUFFER-BUFFER
+ext_buffer_end  .FILL GETVAL_BUFFER-BUFFER_END
 
 .EXTERNAL GETLINE-GETLINE
 .EXTERNAL FROMDEC-FROMDEC
 .EXTERNAL TODEC-TODEC
-
+sub_getline     .FILL GETLINE-GETLINE
+sub_fromdec     .FILL FROMDEC-FROMDEC
+sub_todec       .FILL TODEC-TODEC
 
 ;
 ;   Subrutina para obtener un valor por teclato en cierto formato, mostrando un prompt y el valor obtenido.
@@ -21,23 +25,27 @@ GETVAL_INT
     ST R1 getval_int_name               ;
     ST R2 getval_int_r2                 ;
     ST R3 getval_int_r3                 ;
+    ST R4 getval_int_r4                 ;
     ST R5 getval_int_r5                 ;
     ST R7 getval_int_r7                 ;
 
     PUTS                                ;   print(prompt)
 
-    LEA R0 GETVAL_BUFFER-BUFFER         ;
-    LEA R1 GETVAL_BUFFER-BUFFER_END     ;
-    JSR GETLINE-GETLINE                 ;   [R0] buffer = getline()
+    LD R0 ext_buffer                    ;
+    LD R1 ext_buffer_end                ;
+    LD R2 sub_getline                   ;
+    JSRR R2                             ;   [R0] buffer = getline()
 
-    JSR FROMDEC-FROMDEC                 ;   [R0, R1, R5] = [entero, decimal, errores]
+    LD R2 sub_fromdec                   ;
+    JSRR R2                             ;   [R0, R1, R5] = [entero, decimal, errores]
 
     ST R0 getval_int_entero             ;
     AND R1 R1 #0                        ;   decimal = 0
 
-    LEA R2 GETVAL_BUFFER-BUFFER         ;
+    LD R2 ext_buffer                    ;
     AND R3 R3 #0                        ;   # (R3 = formato)
-    JSR TODEC-TODEC                     ;   [R2] = buffer   # (con valor actualizado)
+    LD R4 sub_todec                     ;
+    JSRR R4                             ;   [R2] = buffer   # (con valor actualizado)
 
     LD R0 getval_int_name               ;
     PUTS                                ;
@@ -51,6 +59,7 @@ GETVAL_INT
     LD R1 getval_int_name               ;
     LD R2 getval_int_r2                 ;
     LD R3 getval_int_r3                 ;
+    LD R4 getval_int_r4                 ;
     LD R5 getval_int_r5                 ;
     LD R7 getval_int_r7                 ;
     RET                                 ;
@@ -59,6 +68,7 @@ getval_int_entero  .FILL #0
 getval_int_name    .FILL #0
 getval_int_r2      .FILL #0
 getval_int_r3      .FILL #0
+getval_int_r4      .FILL #0
 getval_int_r5      .FILL #0
 getval_int_r7      .FILL #0
 

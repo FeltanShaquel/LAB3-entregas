@@ -1,6 +1,7 @@
 
 
 .EXTERNAL SUMOVER-SUMOVER
+sub_sumover     .FILL SUMOVER-SUMOVER
 
 
 ;   ============================================================================
@@ -181,7 +182,8 @@ todec_dec_loop1                         ;
     LD R0 todec_fraccion_l              ;
     LD R1 todec_aux_1                   ;
     AND R2 R2 #0                        ;
-    JSR SUMOVER-SUMOVER                 ;
+    LD R3 sub_sumover                   ;
+    JSRR R3                             ;
     ST R0 todec_fraccion_l              ;
     LD R0 todec_fraccion_h              ;
     LD R1 todec_aux_0                   ;
@@ -217,7 +219,8 @@ todec_dec_loop2                         ;   while True:
     LD R0 todec_fraccion_l              ;
     LDR R1 R5 #1                        ;
     AND R2 R2 #0                        ;
-    JSR SUMOVER-SUMOVER                 ;
+    LD R3 sub_sumover                   ;
+    JSRR R3                             ;
     
     LD R1 todec_fraccion_h              ;
     ADD R1 R1 R2                        ;

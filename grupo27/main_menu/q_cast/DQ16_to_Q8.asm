@@ -2,6 +2,7 @@
 
 
 .EXTERNAL CIRCLSH-CIRCLSH
+sub_circlsh     .FILL CIRCLSH-CIRCLSH
 
 
 ;   ============================================================================
@@ -22,13 +23,15 @@ DQ16_TO_Q8
 
     ST R1 dq16_to_q8_r1
     ST R2 dq16_to_q8_r2
+    ST R3 dq16_to_q8_r3
     ST R7 dq16_to_q8_r7
     
     ; [R0] entero
     ; [R1] decimal
     
     LD R2 dq16_to_q8_n
-    JSR CIRCLSH-CIRCLSH
+    LD R3 sub_circlsh
+    JSRR R3
 
     ADD R1 R1 #0
     BRzp dq16_to_q8_ret
@@ -37,11 +40,13 @@ DQ16_TO_Q8
 dq16_to_q8_ret
     LD R1 dq16_to_q8_r1
     LD R2 dq16_to_q8_r2
+    LD R3 dq16_to_q8_r3
     LD R7 dq16_to_q8_r7
     RET
 
 dq16_to_q8_r1   .FILL #0
 dq16_to_q8_r2   .FILL #0
+dq16_to_q8_r3   .FILL #0
 dq16_to_q8_r7   .FILL #0
 dq16_to_q8_n    .FILL #8
 

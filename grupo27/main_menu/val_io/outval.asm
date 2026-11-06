@@ -1,8 +1,11 @@
 
 
 .EXTERNAL GETVAL_BUFFER-BUFFER
+ext_buffer      .FILL GETVAL_BUFFER-BUFFER
 
 .EXTERNAL TODEC-TODEC
+sub_todec       .FILL TODEC-TODEC 
+
 
 ;
 ;   Subrutina para mostrar un valor por pantalla en formato decimal.
@@ -17,10 +20,11 @@ OUTVAL
     ST R4 outval_r4                     ;
     ST R7 outval_r7                     ;
 
-    LEA R2 GETVAL_BUFFER-BUFFER         ;
+    LD R2 ext_buffer                    ;
     AND R3 R3 #0                        ;
-    JSR TODEC-TODEC                     ;
-    LEA R0 GETVAL_BUFFER-BUFFER         ;
+    LD R4 sub_todec                     ;
+    JSRR R4                             ;
+    LD R0 ext_buffer                    ;
     PUTS                                ;   print(todec(value))
     AND R0 R0 #0                        ;
     ADD R0 R0 #10                       ;

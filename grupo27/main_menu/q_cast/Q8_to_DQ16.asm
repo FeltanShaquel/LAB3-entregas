@@ -2,6 +2,7 @@
 
 
 .EXTERNAL CIRCLSH-CIRCLSH
+sub_circlsh     .FILL CIRCLSH-CIRCLSH
 
 
 ;   ============================================================================
@@ -23,6 +24,7 @@
 Q8_TO_DQ16
 
     ST R2 q8_to_dq16_r2
+    ST R3 q8_to_dq16_r3
     ST R7 q8_to_dq16_r7
     
     ; [R0] q7.8
@@ -35,16 +37,19 @@ Q8_TO_DQ16
 
 q8_to_dq16_sk1
     LD R2 q8_to_dq16_n
-    JSR CIRCLSH-CIRCLSH
+    LD R3 sub_circlsh
+    JSRR R3
     
     LD R2 q8_to_dq16_mask
     AND R1 R1 R2
 
     LD R2 q8_to_dq16_r2
+    LD R3 q8_to_dq16_r3
     LD R7 q8_to_dq16_r7
     RET
 
 q8_to_dq16_r2       .FILL #0
+q8_to_dq16_r3       .FILL #0
 q8_to_dq16_r7       .FILL #0
 q8_to_dq16_n        .FILL #8
 q8_to_dq16_mask     .FILL xFF00

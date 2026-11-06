@@ -3,15 +3,27 @@
 .EXTERNAL GETCFILTERED-GETCFILTERED
 .EXTERNAL FROMHEX-FROMHEX
 .EXTERNAL PAUSE-PAUSE
+sub_getcfiltered    .FILL GETCFILTERED-GETCFILTERED
+sub_fromhex         .FILL FROMHEX-FROMHEX
+sub_pause           .FILL PAUSE-PAUSE
 
+.EXTERNAL Q14_TO_DQ16-Q14_TO_DQ16
 .EXTERNAL Q12_TO_DQ16-Q12_TO_DQ16
 .EXTERNAL Q8_TO_DQ16-Q8_TO_DQ16
+sub_from_q14        .FILL Q14_TO_DQ16-Q14_TO_DQ16
+sub_from_q12        .FILL Q12_TO_DQ16-Q12_TO_DQ16
+sub_from_q8         .FILL Q8_TO_DQ16-Q8_TO_DQ16
 
 .EXTERNAL GETVAL-GETVAL         
 .EXTERNAL GETVAL_INT-GETVAL_INT 
 .EXTERNAL GETVAL_Q8-GETVAL_Q8   
 .EXTERNAL GETVAL_Q12-GETVAL_Q12 
 .EXTERNAL OUTVAL-OUTVAL
+sub_getval          .FILL GETVAL-GETVAL
+sub_getval_int      .FILL GETVAL_INT-GETVAL_INT
+sub_getval_q8       .FILL GETVAL_Q8-GETVAL_Q8
+sub_getval_q12      .FILL GETVAL_Q12-GETVAL_Q12
+sub_outval          .FILL OUTVAL-OUTVAL
 
 ;   ============================================================================
 ;   Subrutina: MAIN_MENU
@@ -68,7 +80,7 @@ main_menu_show_menu                     ;
     PUTS                                ;   print(nodo.texto)
 
     LDR R0 R5 #2                        ;
-    LD R1 main_menu_sub_getcfiltered    ;
+    LD R1 sub_getcfiltered              ;
     JSRR R1                             ;   [R0] char = getcfiltered(nodo.filtro)
 
     LEA R1 main_menu_aux_0              ;
@@ -76,7 +88,7 @@ main_menu_show_menu                     ;
     AND R0 R0 #0                        ;
     STR R0 R1 #1                        ;
     ADD R0 R1 #0                        ;   [R0] buffer = char + '\0'
-    LD R1 main_menu_sub_fromhex         ;
+    LD R1 sub_fromhex                   ;
     JSRR R1                             ;   [R0] valor = fromhex(buffer) # (tambien cambia [R5] banderas de error)
 
     BR main_menu_swap_node              ;   # Cambio de nodo (offset = valor)
@@ -94,10 +106,10 @@ main_menu_placeholder
 
     LEA R0 main_menu_prompt_a           ;
     LEA R1 main_menu_text_a             ;
-    LD R2 main_menu_sub_getval          ; 
+    LD R2 sub_getval                    ; 
     JSRR R2                             ;   [R0, R1] = getval("a")
 
-    LD R0 main_menu_sub_pause           ;
+    LD R0 sub_pause                     ;
     JSRR R0                             ;   pause()
 
     AND R0 R0 #0                        ;
@@ -114,14 +126,14 @@ main_menu_one_integer_noresult
 
     LEA R0 main_menu_prompt_a           ;
     LEA R1 main_menu_text_a             ;
-    LD R2 main_menu_sub_getval_int      ;
+    LD R2 sub_getval_int                ;
     JSRR R2                             ;   [R0] = getval_int("a")
 
     LDR R2 R5 #4                        ;
     LDR R2 R2 #0                        ;
     JSRR R2                             ;   node.subrutina(value_a)
 
-    LD R0 main_menu_sub_pause           ;
+    LD R0 sub_pause                     ;
     JSRR R0                             ;   pause()
 
     AND R0 R0 #0                        ;
@@ -137,14 +149,14 @@ main_menu_two_integer
 
     LEA R0 main_menu_prompt_a           ;
     LEA R1 main_menu_text_a             ;
-    LD R2 main_menu_sub_getval_int      ;
+    LD R2 sub_getval_int                ;
     JSRR R2                             ;   [R0] = getval_int("a")
 
     ST R0 main_menu_aux_0               ;
 
     LEA R0 main_menu_prompt_b           ;
     LEA R1 main_menu_text_b             ;
-    LD R2 main_menu_sub_getval_int      ;
+    LD R2 sub_getval_int                ;
     JSRR R2                             ;   [R0] = getval_int("b")
 
     ADD R1 R0 #0                        ;
@@ -155,10 +167,10 @@ main_menu_two_integer
     JSRR R2                             ;   [R0] result = node.subrutina(value_a, value_b)
 
     AND R1 R1 #0                        ;
-    LD R2 main_menu_sub_outval          ;
+    LD R2 sub_outval                    ;
     JSRR R2                             ;   outval(result)
 
-    LD R0 main_menu_sub_pause           ;
+    LD R0 sub_pause                     ;
     JSRR R0                             ;   pause()
 
     AND R0 R0 #0                        ;
@@ -174,19 +186,47 @@ main_menu_one_q3_12
 
     LEA R0 main_menu_prompt_a           ;
     LEA R1 main_menu_text_a             ;
-    LD R2 main_menu_sub_getval_q12      ;
+    LD R2 sub_getval_q12                ;
     JSRR R2                             ;   [R0] = getval_q12("a")
 
     LDR R2 R5 #4                        ;
     LDR R2 R2 #0                        ;
     JSRR R2                             ;   [R0] result = node.subrutina(value_a)
 
-    LD R1 main_menu_sub_from_q12        ;
+    LD R1 sub_from_q12                  ;
     JSRR R1                             ;
-    LD R2 main_menu_sub_outval          ;
+    LD R2 sub_outval                    ;
     JSRR R2                             ;   outval(fromQ12(result))
 
-    LD R0 main_menu_sub_pause           ;
+    LD R0 sub_pause                     ;
+    JSRR R0                             ;   pause()
+
+    AND R0 R0 #0                        ;
+    BR main_menu_swap_node              ;   # Cambio de nodo (offset = 0)
+
+
+;   ==- Controlador subrutinas de un Q3.12 con resultado en Q1.14 -=============
+main_menu_one_q3_12_result_q1_14
+    LD R5 main_menu_state               ;   [R5] nodo = [estado]
+
+    LDR R0 R5 #1                        ;
+    PUTS                                ;   print(nodo.texto)
+
+    LEA R0 main_menu_prompt_a           ;
+    LEA R1 main_menu_text_a             ;
+    LD R2 sub_getval_q12                ;
+    JSRR R2                             ;   [R0] = getval_q12("a")
+
+    LDR R2 R5 #4                        ;
+    LDR R2 R2 #0                        ;
+    JSRR R2                             ;   [R0] result = node.subrutina(value_a)
+
+    LD R1 sub_from_q14                  ;
+    JSRR R1                             ;
+    LD R2 sub_outval                    ;
+    JSRR R2                             ;   outval(fromQ14(result))
+
+    LD R0 sub_pause                     ;
     JSRR R0                             ;   pause()
 
     AND R0 R0 #0                        ;
@@ -202,19 +242,19 @@ main_menu_one_q7_8
 
     LEA R0 main_menu_prompt_a           ;
     LEA R1 main_menu_text_a             ;
-    LD R2 main_menu_sub_getval_q8       ;
+    LD R2 sub_getval_q8                 ;
     JSRR R2                             ;   [R0] = getval_q8("a")
 
     LDR R2 R5 #4                        ;
     LDR R2 R2 #0                        ;
     JSRR R2                             ;   [R0] result = node.subrutina(value_a)
 
-    LD R1 main_menu_sub_from_q8         ;
+    LD R1 sub_from_q8                   ;
     JSRR R1                             ;
-    LD R2 main_menu_sub_outval          ;
+    LD R2 sub_outval                    ;
     JSRR R2                             ;   outval(fromQ8(result))
 
-    LD R0 main_menu_sub_pause           ;
+    LD R0 sub_pause                     ;
     JSRR R0                             ;   pause()
 
     AND R0 R0 #0                        ;
@@ -230,14 +270,14 @@ main_menu_two_q7_8
 
     LEA R0 main_menu_prompt_a           ;
     LEA R1 main_menu_text_a             ;
-    LD R2 main_menu_sub_getval_q8       ;
+    LD R2 sub_getval_q8                 ;
     JSRR R2                             ;   [R0] = getval_q8("a")
 
     ST R0 main_menu_aux_0               ;
 
     LEA R0 main_menu_prompt_b           ;
     LEA R1 main_menu_text_b             ;
-    LD R2 main_menu_sub_getval_q8       ;
+    LD R2 sub_getval_q8                 ;
     JSRR R2                             ;   [R0] = getval_q8("b")
 
     ADD R1 R0 #0                        ;
@@ -247,12 +287,12 @@ main_menu_two_q7_8
     LDR R2 R2 #0                        ;
     JSRR R2                             ;   [R0] result = node.subrutina(value_a, value_b)
 
-    LD R1 main_menu_sub_from_q8         ;
+    LD R1 sub_from_q8                   ;
     JSRR R1                             ;
-    LD R2 main_menu_sub_outval          ;
+    LD R2 sub_outval                    ;
     JSRR R2                             ;   outval(fromQ8(result))
 
-    LD R0 main_menu_sub_pause           ;
+    LD R0 sub_pause                     ;
     JSRR R0                             ;   pause()
 
     AND R0 R0 #0                        ;
@@ -285,19 +325,6 @@ main_menu_prompt_b          .STRINGZ "b > "
 main_menu_text_b            .STRINGZ "b:  "
 main_menu_aux_0             .FILL #0
 main_menu_aux_1             .FILL #0
-
-main_menu_sub_getcfiltered  .FILL GETCFILTERED-GETCFILTERED
-main_menu_sub_fromhex       .FILL FROMHEX-FROMHEX
-main_menu_sub_pause         .FILL PAUSE-PAUSE
-
-main_menu_sub_from_q12      .FILL Q12_TO_DQ16-Q12_TO_DQ16
-main_menu_sub_from_q8       .FILL Q8_TO_DQ16-Q8_TO_DQ16
-
-main_menu_sub_getval        .FILL GETVAL-GETVAL         
-main_menu_sub_getval_int    .FILL GETVAL_INT-GETVAL_INT 
-main_menu_sub_getval_q8     .FILL GETVAL_Q8-GETVAL_Q8   
-main_menu_sub_getval_q12    .FILL GETVAL_Q12-GETVAL_Q12 
-main_menu_sub_outval        .FILL OUTVAL-OUTVAL
 
 
 
@@ -369,7 +396,7 @@ main_menu_sin_table         .FILL main_menu_one_q3_12
 main_menu_sin_table_text    .STRINGZ "\n\n==SENO TRIGONOMETRICO (TABLE)==\n a (Q3.12)\n"
 main_menu_sin_table_next    .FILL main_menu_init
 ;   ----------------------------------------------------------------------------
-main_menu_sin_chev          .FILL main_menu_one_q3_12
+main_menu_sin_chev          .FILL main_menu_one_q3_12_result_q1_14
                             .FILL main_menu_sin_chev_text
                             .FILL #0
                             .FILL main_menu_sin_chev_next
